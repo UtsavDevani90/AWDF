@@ -1,55 +1,57 @@
 import { useState } from "react";
-import { FaGithub, FaExternalLinkAlt, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-// Reusable ProjectCard — receives project data as props
 const ProjectCard = ({ project }) => {
-  // useState: toggle show/hide project details
   const [showDetails, setShowDetails] = useState(false);
 
-  const { title, emoji, description, details, tech, github, demo, status } = project;
+  const { title, description, details, tech, github, demo, status } = project;
+
+  const initials = title
+    .split(" ")
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
 
   return (
     <div className="project-card">
-      {/* Placeholder image with emoji */}
-      <div className="project-img-placeholder">{emoji}</div>
+      <div className="project-img-placeholder">
+        <span className="project-initials">{initials}</span>
+      </div>
 
       <div className="project-body">
         <div className="project-header">
           <h3 className="project-title">{title}</h3>
-          {/* Ternary: live vs in-progress status badge */}
-          <span className={status === "Live" ? "project-status status-live" : "project-status status-progress"}>
-            {status === "Live" ? "✅ Live" : "🚧 In Progress"}
+          <span className={status === "Public" ? "project-status status-live" : "project-status status-progress"}>
+            {status === "Public" ? "Public" : "Private"}
           </span>
         </div>
 
         <p className="project-desc">{description}</p>
 
-        {/* Conditional rendering: show details when toggled */}
         {showDetails && (
           <div className="project-details">
             <p>{details}</p>
           </div>
         )}
 
-        {/* Toggle details button */}
         <button className="details-toggle" onClick={() => setShowDetails(!showDetails)}>
-          {/* Ternary: show/hide label */}
-          {showDetails ? <><FaChevronUp /> Hide Details</> : <><FaChevronDown /> Show Details</>}
+          {showDetails ? "Hide Details" : "Show Details"}
         </button>
 
-        {/* Tech stack tags */}
         <div className="tech-tags">
-          {tech.map((t) => <span key={t} className="tech-tag">{t}</span>)}
+          {tech.map((item) => (
+            <span key={item} className="tech-tag">{item}</span>
+          ))}
         </div>
 
-        {/* External anchor tags for GitHub and Live Demo */}
         <div className="project-links">
           <a href={github} target="_blank" rel="noopener noreferrer" className="link-github">
-            <FaGithub /> GitHub
+            GitHub
           </a>
-          <a href={demo} target="_blank" rel="noopener noreferrer" className="link-demo">
-            <FaExternalLinkAlt /> Live Demo
-          </a>
+          {demo ? (
+            <a href={demo} target="_blank" rel="noopener noreferrer" className="link-demo">
+              Live Demo
+            </a>
+          ) : null}
         </div>
       </div>
     </div>

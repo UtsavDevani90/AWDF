@@ -1,60 +1,65 @@
 import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
+import ErrorPage from "./ErrorPage";
 
-const ALL_PROJECTS = [
-  {
-    id: 1,
-    title: "Import Export Website",
-    emoji: "🚢",
-    category: "Fullstack",
-    description: "A full-featured B2B platform for managing import/export operations with real-time tracking.",
-    details: "Built with React frontend, Node.js/Express backend, and PostgreSQL database. Features include user authentication, shipment tracking, invoice generation, and admin dashboard.",
-    tech: ["React", "Node.js", "Express", "PostgreSQL", "Tailwind CSS"],
-    github: "https://github.com/username/import-export",
-    demo: "https://import-export-demo.vercel.app",
-    status: "Live",
-  },
-  {
-    id: 2,
-    title: "AI Study Assistant",
-    emoji: "🤖",
-    category: "AI",
-    description: "An intelligent study companion powered by AI that helps students learn more effectively.",
-    details: "Integrates OpenAI API for smart Q&A, generates quizzes from uploaded notes, tracks study progress, and provides personalized learning recommendations.",
-    tech: ["React", "OpenAI API", "Node.js", "MongoDB", "CSS Modules"],
-    github: "https://github.com/username/ai-study-assistant",
-    demo: "https://ai-study-assistant.vercel.app",
-    status: "In Progress",
-  },
-  {
-    id: 3,
-    title: "Portfolio Website",
-    emoji: "💼",
-    category: "Frontend",
-    description: "This very portfolio — a modern, responsive personal website built with React and Vite.",
-    details: "Features dark/light mode, smooth animations, typing effect, scroll progress bar, project filtering, and full React Router navigation.",
-    tech: ["React", "Vite", "React Router", "React Icons", "CSS"],
-    github: "https://github.com/username/portfolio",
-    demo: "https://myportfolio.vercel.app",
-    status: "Live",
-  },
-];
-
-const FILTERS = ["All", "Frontend", "Fullstack", "AI"];
+const FILTERS = ["All", "JavaScript", "TypeScript", "Python", "Other"];
 
 const Projects = () => {
-  // useState: active filter category
   const [activeFilter, setActiveFilter] = useState("All");
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // useEffect: set document title
   useEffect(() => {
     document.title = "Projects | My Portfolio";
+
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch("https://api.github.com/users/UtsavDevani90/repos", {
+          headers: {
+            Accept: "application/vnd.github+json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const normalizedProjects = data
+          .filter((repo) => !repo.fork)
+          .map((repo) => ({
+            id: repo.id,
+            title: repo.name
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" "),
+            description: repo.description || "A project from my GitHub profile.",
+            details: repo.homepage
+              ? "This project includes a live demo and source code on GitHub."
+              : "Source code is available on GitHub for this project.",
+            tech: repo.language ? [repo.language] : ["GitHub"],
+            github: repo.html_url,
+            demo: repo.homepage || "",
+            status: repo.private ? "Private" : "Public",
+            category: repo.language || "Other",
+          }));
+
+        setProjects(normalizedProjects);
+      } catch (err) {
+        setError(err.message || "Unable to load projects right now.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
-  // Filter projects based on active category
   const filtered = activeFilter === "All"
-    ? ALL_PROJECTS
-    : ALL_PROJECTS.filter((p) => p.category === activeFilter);
+    ? projects
+    : projects.filter((project) => project.category === activeFilter);
 
   return (
     <div className="page">
@@ -62,25 +67,32 @@ const Projects = () => {
         <h2 className="section-title">My <span className="accent">Projects</span></h2>
         <p className="section-subtitle">Things I've built</p>
 
-        {/* Filter Buttons */}
         <div className="filter-btns">
-          {FILTERS.map((f) => (
+          {FILTERS.map((filter) => (
             <button
-              key={f}
-              className={activeFilter === f ? "filter-btn active" : "filter-btn"}
-              onClick={() => setActiveFilter(f)}
+              key={filter}
+              className={activeFilter === filter ? "filter-btn active" : "filter-btn"}
+              onClick={() => setActiveFilter(filter)}
             >
-              {f}
+              {filter}
             </button>
           ))}
         </div>
 
-        {/* Project Cards Grid — passing project data as props */}
-        <div className="projects-grid">
-          {filtered.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner" />
+            <p>Loading projects from GitHub...</p>
+          </div>
+        ) : error ? (
+          <ErrorPage message={error} />
+        ) : (
+          <div className="projects-grid">
+            {filtered.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
