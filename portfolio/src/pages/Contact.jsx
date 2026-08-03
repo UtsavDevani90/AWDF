@@ -43,11 +43,11 @@ const Contact = () => {
 
             <div className="contact-items">
               {/* External anchor tags for contact methods */}
-              <a href="mailto:your@email.com" className="contact-item">
+              <a href="mailto:utsavdevani90@gmail.com" className="contact-item">
                 <span className="contact-item-icon"><FaEnvelope /></span>
                 your@email.com
               </a>
-              <a href="https://github.com/username" target="_blank" rel="noopener noreferrer" className="contact-item">
+              <a href="https://github.com/Utsavdevani90" target="_blank" rel="noopener noreferrer" className="contact-item">
                 <span className="contact-item-icon"><FaGithub /></span>
                 github.com/username
               </a>
@@ -55,7 +55,7 @@ const Contact = () => {
                 <span className="contact-item-icon"><FaLinkedin /></span>
                 linkedin.com/in/username
               </a>
-              <a href="https://instagram.com/username" target="_blank" rel="noopener noreferrer" className="contact-item">
+              <a href="https://instagram.com/utsav_devani" target="_blank" rel="noopener noreferrer" className="contact-item">
                 <span className="contact-item-icon"><FaInstagram /></span>
                 @username
               </a>
