@@ -46,14 +46,7 @@ body {
 }
 
 /* ===== SCROLL PROGRESS BAR ===== */
-.scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  z-index: 9999;
-  transition: width 0.1s linear;
-}
+
 
 /* ===== LOADING SCREEN ===== */
 .loading-screen {
@@ -162,7 +155,7 @@ body {
   display: none;
   flex-direction: column;
   background: var(--bg-nav);
-  border-top: 1px solid var(--border);
+  /* border-top: 1px solid var(--border); */
   padding: 1rem 1.5rem;
   gap: 0.25rem;
 }
@@ -255,10 +248,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 2rem 1.5rem;
+  padding: 5rem 1.5rem;
   position: relative;
   overflow: hidden;
+}
+.hero-inner {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 4rem;
+  position: relative;
+  z-index: 2;
 }
 .hero::before {
   content: '';
@@ -266,16 +268,50 @@ body {
   inset: 0;
   background: radial-gradient(ellipse at center, rgba(108,99,255,0.15) 0%, transparent 70%);
 }
-.hero-content { position: relative; z-index: 1; max-width: 700px; }
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 650px;
+  text-align: left;
+}
+.hero-photo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+}
 .hero-avatar {
-  width: 140px; height: 140px;
+  width: 390px;
+  height: 390px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 1.5rem;
+  object-position: center;
+  position: relative;
+  z-index: 3;
   border: 4px solid var(--accent);
-  box-shadow: 0 0 0 8px rgba(108,99,255,0.2);
-  transition: border-color var(--transition);
+  box-shadow: 0 0 0 10px rgba(108, 99, 255, 0.15);
 }
+
+.hero-avatar:hover {
+  transform: scale(1.03);
+}
+
+.hero-container {
+  max-width: 1100px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  align-items: center;
+  gap: 4rem;
+}
+
+.hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .hero-greeting { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 0.5rem; }
 .hero-name {
   font-size: clamp(2.2rem, 6vw, 3.5rem);
@@ -628,4 +664,311 @@ body {
 @media (max-width: 480px) {
   .hero-btns { flex-direction: column; align-items: center; }
   .skills-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== TASKS PAGE ===== */
+
+/* Narrow the container so task cards don't stretch too wide */
+.tasks-container { max-width: 860px; }
+
+/* ── Error banner ── */
+.task-error-msg {
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dark-theme .task-error-msg { background: #450a0a; color: #fca5a5; }
+
+/* ── Add Task card — mirrors .contact-form / .about-card style ── */
+.task-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--shadow);
+}
+.task-form-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.task-form-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 1.1em;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* Priority select — inherits .form-group input styles */
+.task-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition);
+  outline: none;
+  cursor: pointer;
+}
+.task-select:focus { border-color: var(--accent); }
+
+/* Priority + submit button side-by-side on desktop */
+.task-form-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: flex-end;
+}
+.task-submit-btn {
+  white-space: nowrap;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  height: fit-content;
+}
+
+/* ── Loading & empty states ── */
+.task-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 0;
+  color: var(--text-muted);
+}
+.task-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+  color: var(--text-muted);
+  text-align: center;
+}
+.task-empty-icon { font-size: 2.5rem; }
+
+/* ── Task cards grid ── */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ── Individual task card — mirrors .project-card / .about-card ── */
+.task-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+.task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+/* Completed cards are slightly dimmed */
+.task-card--done { opacity: 0.72; }
+.task-card--done:hover { opacity: 1; }
+
+/* Card header row */
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.task-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+}
+.task-card-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.task-card-meta { display: flex; align-items: center; gap: 0.5rem; }
+
+/* ── Priority badges ── */
+.task-priority-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.task-priority-low    { background: #d1fae5; color: #065f46; }
+.task-priority-medium { background: #fef3c7; color: #92400e; }
+.task-priority-high   { background: #fee2e2; color: #991b1b; }
+.dark-theme .task-priority-low    { background: #064e3b; color: #6ee7b7; }
+.dark-theme .task-priority-medium { background: #78350f; color: #fcd34d; }
+.dark-theme .task-priority-high   { background: #450a0a; color: #fca5a5; }
+
+/* ── Status badges ── */
+.task-status-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+}
+.task-status--done    { background: #d1fae5; color: #065f46; }
+.task-status--pending { background: var(--border); color: var(--text-muted); }
+.dark-theme .task-status--done { background: #064e3b; color: #6ee7b7; }
+
+/* ── Card action buttons ── */
+.task-card-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+.task-btn-toggle {
+  flex: 1;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.task-btn-toggle:hover:not(:disabled) {
+  background: var(--accent-2);
+  transform: translateY(-1px);
+}
+.task-btn-delete {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: #ef4444;
+  border: 1.5px solid #ef4444;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.task-btn-delete:hover:not(:disabled) {
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-1px);
+}
+.task-btn-toggle:disabled,
+.task-btn-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .task-grid { grid-template-columns: 1fr; }
+  .task-form-row { grid-template-columns: 1fr; }
+  .task-submit-btn { width: 100%; justify-content: center; }
+}
+
+/* ===== TASKS PAGE — EDIT FORM ===== */
+
+/* Inline edit form that replaces the card content */
+.task-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.task-edit-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+/* Save + Cancel button row */
+.task-edit-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Edit button on the read-only card */
+.task-btn-edit {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.task-btn-edit:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Save button — primary accent fill */
+.task-btn-save {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.task-btn-save:hover:not(:disabled) {
+  background: var(--accent-2);
+  transform: translateY(-1px);
+}
+
+/* Cancel button — muted outline */
+.task-btn-cancel {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.task-btn-cancel:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+/* Disable state for all task action buttons */
+.task-btn-edit:disabled,
+.task-btn-save:disabled,
+.task-btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

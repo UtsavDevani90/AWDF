@@ -101,7 +101,7 @@ const Home = ({ theme }) => {
             <img
               src="/profile.png"
               alt="Utsav Devani — profile photo"
-              className="hero-photo"
+              className="hero-avatar"
               loading="eager"
             />
 

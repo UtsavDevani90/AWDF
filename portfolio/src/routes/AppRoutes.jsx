@@ -6,7 +6,11 @@ import Skills from "../pages/Skills";
 import Projects from "../pages/Projects";
 import Resume from "../pages/Resume";
 import Contact from "../pages/Contact";
+import Tasks from "../pages/Tasks";
 import NotFound from "../pages/NotFound";
+
+
+
 
 // AppRoutes — centralised route definitions for the portfolio app
 const AppRoutes = ({ theme }) => (
@@ -17,6 +21,7 @@ const AppRoutes = ({ theme }) => (
     <Route path="/projects" element={<Projects />} />
     <Route path="/resume"  element={<Resume />} />
     <Route path="/contact" element={<Contact />} />
+    <Route path="/tasks" element={<Tasks />} />
     {/* Catch-all — renders 404 for any unknown path */}
     <Route path="*"        element={<NotFound />} />
   </Routes>
