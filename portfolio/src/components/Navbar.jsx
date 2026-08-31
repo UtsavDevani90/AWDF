@@ -1,26 +1,36 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
+import { useAuth } from "../context/AuthContext";
 
+// Static nav links — all existing portfolio links preserved
 const NAV_LINKS = [
-  { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/skills", label: "Skills" },
-  { to: "/projects", label: "Projects" },
-  { to: "/resume", label: "Resume" },
-  { to: "/tasks",label: "Tasks" },
-  { to: "/contact", label: "Contact" },
+  { to: "/",        label: "Home"     },
+  { to: "/about",   label: "About"    },
+  { to: "/skills",  label: "Skills"   },
+  { to: "/projects",label: "Projects" },
+  { to: "/resume",  label: "Resume"   },
+  { to: "/tasks",   label: "Tasks"    },
+  { to: "/contact", label: "Contact"  },
 ];
 
 const Navbar = ({ theme, setTheme }) => {
-  // useState: mobile menu open/close
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const closeMenu = () => setMenuOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    closeMenu();
+    navigate("/login");
+  };
 
   return (
     <nav className="navbar">
       <div className="nav-container">
+
         {/* Logo */}
         <Link to="/" className="nav-logo" onClick={closeMenu}>
           &lt;Portfolio /&gt;
@@ -30,7 +40,6 @@ const Navbar = ({ theme, setTheme }) => {
         <ul className="nav-links">
           {NAV_LINKS.map(({ to, label }) => (
             <li key={to}>
-              {/* NavLink adds "active" class automatically */}
               <NavLink
                 to={to}
                 end={to === "/"}
@@ -42,9 +51,50 @@ const Navbar = ({ theme, setTheme }) => {
           ))}
         </ul>
 
+        {/* Right side: theme + auth buttons + hamburger */}
         <div className="nav-right">
           <ThemeToggle theme={theme} setTheme={setTheme} />
-          {/* Hamburger button — ternary for open/close icon */}
+
+          {/* Auth controls — desktop */}
+          <div className="nav-auth">
+            {isAuthenticated ? (
+              <>
+                <span className="nav-user-greeting">
+                  👋 {user?.name?.split(" ")[0] || "User"}
+                </span>
+                <button
+                  id="nav-logout-btn"
+                  className="nav-auth-btn nav-auth-btn--logout"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  id="nav-login-link"
+                  className={({ isActive }) =>
+                    `nav-auth-btn nav-auth-btn--login${isActive ? " active" : ""}`
+                  }
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  id="nav-register-link"
+                  className={({ isActive }) =>
+                    `nav-auth-btn nav-auth-btn--register${isActive ? " active" : ""}`
+                  }
+                >
+                  Register
+                </NavLink>
+              </>
+            )}
+          </div>
+
+          {/* Hamburger button */}
           <button
             className={menuOpen ? "hamburger open" : "hamburger"}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -55,7 +105,7 @@ const Navbar = ({ theme, setTheme }) => {
         </div>
       </div>
 
-      {/* Mobile Menu — conditional rendering with ternary */}
+      {/* Mobile Menu — conditional rendering */}
       {menuOpen && (
         <div className="mobile-menu">
           {NAV_LINKS.map(({ to, label }) => (
@@ -69,6 +119,39 @@ const Navbar = ({ theme, setTheme }) => {
               {label}
             </NavLink>
           ))}
+
+          {/* Mobile auth controls */}
+          <div className="mobile-auth">
+            {isAuthenticated ? (
+              <button
+                className="nav-auth-btn nav-auth-btn--logout"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `nav-auth-btn nav-auth-btn--login${isActive ? " active" : ""}`
+                  }
+                  onClick={closeMenu}
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className={({ isActive }) =>
+                    `nav-auth-btn nav-auth-btn--register${isActive ? " active" : ""}`
+                  }
+                  onClick={closeMenu}
+                >
+                  Register
+                </NavLink>
+              </>
+            )}
+          </div>
         </div>
       )}
     </nav>

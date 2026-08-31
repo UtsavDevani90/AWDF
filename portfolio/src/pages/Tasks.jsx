@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { getTasks, createTask, updateTask, deleteTask } from "../api";
+import { useAuth } from "../context/AuthContext";
 
 // Priority badge config — maps value → label + CSS modifier class
 const PRIORITY_META = {
@@ -9,6 +11,8 @@ const PRIORITY_META = {
 };
 
 function Tasks() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // ── State declarations (ALL must come first before any function uses them) ──
 
@@ -25,6 +29,12 @@ function Tasks() {
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
+  // ── 401 handler — clears token and redirects to login ───────────────────
+  const handle401 = useCallback(() => {
+    logout();
+    navigate("/login", { replace: true });
+  }, [logout, navigate]);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -43,6 +53,7 @@ function Tasks() {
       const result = await getTasks();
       setTasks(result.data);
     } catch (err) {
+      if (err.status === 401) { handle401(); return; }
       setError(err.message);
     } finally {
       setLoading(false);
@@ -70,6 +81,7 @@ function Tasks() {
       setPriority("medium");
       showSuccess("✅ Task created successfully!");
     } catch (err) {
+      if (err.status === 401) { handle401(); return; }
       setError(err.message);
     } finally {
       setLoading(false);
@@ -93,6 +105,7 @@ function Tasks() {
       );
       showSuccess(`✅ Task marked as ${result.data.completed ? "complete" : "pending"}!`);
     } catch (err) {
+      if (err.status === 401) { handle401(); return; }
       setError(err.message);
     } finally {
       setLoading(false);
@@ -149,6 +162,7 @@ function Tasks() {
       showSuccess("✅ Task updated successfully!");
 
     } catch (err) {
+      if (err.status === 401) { handle401(); return; }
       // Keep the form open so the user can retry
       setError(err.message);
     } finally {
@@ -168,6 +182,7 @@ function Tasks() {
       setTasks((prev) => prev.filter((t) => t._id !== id));
       showSuccess("🗑️ Task deleted successfully!");
     } catch (err) {
+      if (err.status === 401) { handle401(); return; }
       setError(err.message);
     } finally {
       setLoading(false);

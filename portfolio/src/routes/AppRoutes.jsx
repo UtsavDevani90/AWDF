@@ -1,16 +1,16 @@
 import { Routes, Route } from "react-router-dom";
 
-import Home from "../pages/Home";
-import About from "../pages/About";
-import Skills from "../pages/Skills";
+import Home     from "../pages/Home";
+import About    from "../pages/About";
+import Skills   from "../pages/Skills";
 import Projects from "../pages/Projects";
-import Resume from "../pages/Resume";
-import Contact from "../pages/Contact";
-import Tasks from "../pages/Tasks";
+import Resume   from "../pages/Resume";
+import Contact  from "../pages/Contact";
+import Tasks    from "../pages/Tasks";
+import Login    from "../pages/Login";
+import Register from "../pages/Register";
 import NotFound from "../pages/NotFound";
-
-
-
+import PrivateRoute from "./PrivateRoute";
 
 // AppRoutes — centralised route definitions for the portfolio app
 const AppRoutes = ({ theme }) => (
@@ -21,9 +21,23 @@ const AppRoutes = ({ theme }) => (
     <Route path="/projects" element={<Projects />} />
     <Route path="/resume"  element={<Resume />} />
     <Route path="/contact" element={<Contact />} />
-    <Route path="/tasks" element={<Tasks />} />
+
+    {/* Public auth routes */}
+    <Route path="/login"    element={<Login />} />
+    <Route path="/register" element={<Register />} />
+
+    {/* Protected route — requires valid JWT */}
+    <Route
+      path="/tasks"
+      element={
+        <PrivateRoute>
+          <Tasks />
+        </PrivateRoute>
+      }
+    />
+
     {/* Catch-all — renders 404 for any unknown path */}
-    <Route path="*"        element={<NotFound />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
 
